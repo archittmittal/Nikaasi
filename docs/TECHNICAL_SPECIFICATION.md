@@ -2,15 +2,98 @@
 
 ## Document Control
 
-- **Document Version:** 1.0.0
+- **Document Version:** 1.1.0
 - **Status:** Approved Technical Architecture
-- **Classification:** Engineering & Algorithmic Specification
+- **Classification:** Engineering, Algorithmic & AI Specification
 
 ---
 
-## 1. Algorithmic Models and Heuristics
+## 1. OpenAI Intent Parsing Pipeline and Schemas
 
-### 1.1 Transliteration and Identity Matching Algorithm
+Nikaasi utilizes OpenAI models (GPT-4o / Codex) with structured JSON output and function calling to translate unstructured citizen statements into statutory form parameters.
+
+### 1.1 OpenAI Prompt and System Instruction
+
+```typescript
+export const INTENT_PARSER_SYSTEM_PROMPT = `
+You are the Nikaasi Statutory Intake Assistant. Your role is to analyze a citizen's natural language statement (provided in English, Hindi, or Hinglish) and map their real-world circumstance to the appropriate statutory claim under the Employees' Provident Funds and Miscellaneous Provisions Act, 1952.
+
+Rules:
+1. If the user states they left/resigned from their job more than 2 months ago, classify as FULL_FINAL_SETTLEMENT (Form 19 and Form 10C).
+2. If the user mentions medical emergency, surgery, hospitalization, or illness, classify as ADVANCE_MEDICAL (Form 31, Para 68J).
+3. If the user mentions buying, building, or repairing a house, classify as ADVANCE_HOUSING (Form 31, Para 68B).
+4. If the user mentions children's education or marriage, classify as ADVANCE_SPECIAL (Form 31, Para 68K/68N).
+5. Extract requested amount, months since resignation, and detected language.
+`;
+```
+
+### 1.2 OpenAI Structured Function Calling Schema
+
+```json
+{
+  "name": "classify_provident_fund_intent",
+  "description": "Extracts statutory PF claim parameters from natural language citizen input",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "intent_category": {
+        "type": "string",
+        "enum": [
+          "FULL_FINAL_SETTLEMENT",
+          "ADVANCE_MEDICAL",
+          "ADVANCE_HOUSING",
+          "ADVANCE_EDUCATION_MARRIAGE",
+          "PENSION_SCHEME_CERTIFICATE",
+          "GENERAL_INQUIRY"
+        ]
+      },
+      "primary_form": {
+        "type": "string",
+        "enum": ["FORM_19", "FORM_10C", "FORM_31", "FORM_13", "NONE"]
+      },
+      "secondary_forms": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["FORM_10C", "FORM_19"]
+        }
+      },
+      "statutory_paragraph": {
+        "type": ["string", "null"],
+        "enum": ["PARA_68J", "PARA_68B", "PARA_68K", "PARA_68N", null]
+      },
+      "extracted_requested_amount": {
+        "type": ["number", "null"],
+        "description": "Amount explicitly requested by citizen, in INR"
+      },
+      "months_since_job_exit": {
+        "type": ["number", "null"],
+        "description": "Number of months since employment terminated"
+      },
+      "detected_language": {
+        "type": "string",
+        "enum": ["en", "hi", "hinglish"]
+      },
+      "plain_language_explanation": {
+        "type": "string",
+        "description": "A simple 1-sentence confirmation back to the citizen in their input language explaining what will be filed."
+      }
+    },
+    "required": [
+      "intent_category",
+      "primary_form",
+      "plain_language_explanation",
+      "detected_language"
+    ]
+  }
+}
+```
+
+---
+
+## 2. Algorithmic Models and Heuristics
+
+### 2.1 Transliteration and Identity Matching Algorithm
 
 Name mismatches between Aadhaar (often issued in English transliterated from regional scripts like Devanagari, Tamil, or Bengali) and EPFO records account for the largest share of Class A rejections.
 
@@ -46,7 +129,7 @@ Pipeline:
          Status = HARD_MISMATCH -> Formal Correction Mandatory
 ```
 
-### 1.2 Multi-UAN Timeline Merging Algorithm
+### 2.2 Multi-UAN Timeline Merging Algorithm
 
 When a member has accumulated multiple UANs across different employers, the system checks for overlapping service periods and generates a consolidation sequence:
 
@@ -66,11 +149,11 @@ Algorithm: ValidateAndMergeUANHistory(MemberRecord)
 
 ---
 
-## 2. SLA State Machine Engine
+## 3. SLA State Machine Engine
 
 The SLA engine tracks the 15-day employer countdown and coordinates automatic jurisdictional escalation.
 
-### 2.1 State Definitions
+### 3.1 State Definitions
 
 | State Name | Description | Active Actor |
 | :--- | :--- | :--- |
@@ -84,7 +167,7 @@ The SLA engine tracks the 15-day employer countdown and coordinates automatic ju
 | `COMMISSIONER_APPROVED` | Regional Field Office approves via statutory override | Assistant PF Commissioner |
 | `SETTLEMENT_DISBURSED` | Direct credit issued to member's verified bank account | Payment Gateway / NPCI |
 
-### 2.2 Transition Table
+### 3.2 Transition Table
 
 ```
 +------------------------+--------------------------+----------------------------+
@@ -104,9 +187,9 @@ The SLA engine tracks the 15-day employer countdown and coordinates automatic ju
 
 ---
 
-## 3. Data Schemas and Interfaces (TypeScript / JSON Schema)
+## 4. Data Schemas and Interfaces (TypeScript / JSON Schema)
 
-### 3.1 Member Profile Schema
+### 4.1 Member Profile Schema
 
 ```typescript
 export interface MemberProfile {
@@ -138,7 +221,7 @@ export interface MemberProfile {
 }
 ```
 
-### 3.2 Pre-Flight Diagnostic Result Schema
+### 4.2 Pre-Flight Diagnostic Result Schema
 
 ```typescript
 export interface DiagnosticResult {
@@ -168,7 +251,7 @@ export interface DiagnosticResult {
 }
 ```
 
-### 3.3 Attestation and SLA Dossier Schema
+### 4.3 Attestation and SLA Dossier Schema
 
 ```typescript
 export interface AttestationDossier {
@@ -199,7 +282,7 @@ export interface AttestationDossier {
 
 ---
 
-## 4. Sandbox Personas for Demonstration
+## 5. Sandbox Personas for Demonstration
 
 | Persona ID | Name | Case Classification | Scenario Parameters |
 | :--- | :--- | :--- | :--- |

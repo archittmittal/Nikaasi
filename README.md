@@ -3,6 +3,7 @@
 > Designing for the 1 in 5 Provident Fund claims that get rejected.
 
 [![Build What Moves India](https://img.shields.io/badge/Hackathon-Build%20What%20Moves%20India-blue.svg)](https://github.com/archittmittal/Nikaasi)
+[![Powered by OpenAI](https://img.shields.io/badge/AI%20Engine-OpenAI%20GPT--4o-412991.svg)]()
 [![Status](https://img.shields.io/badge/Status-Active%20Architecture-brightgreen.svg)]()
 [![Compliance](https://img.shields.io/badge/EPFO-Independent%20Prototype-amber.svg)]()
 [![Data Mode](https://img.shields.io/badge/Data%20Mode-Mocked%20Sandbox-blue.svg)]()
@@ -12,11 +13,16 @@
 
 ## Table of Contents
 
+- [Builder Brief Alignment and Core Questions](#builder-brief-alignment-and-core-questions)
+- [Official Submission Summary (178 Words)](#official-submission-summary-178-words)
 - [Executive Summary](#executive-summary)
 - [Problem Analysis and Industry Metrics](#problem-analysis-and-industry-metrics)
 - [Root Cause Classification](#root-cause-classification)
 - [Core Architectural Pillars](#core-architectural-pillars)
+- [OpenAI Model & Codex Integration](#openai-model--codex-integration)
 - [System Architecture and Workflow](#system-architecture-and-workflow)
+- [Scope and Boundary Disclosures: What Works vs What is Mocked](#scope-and-boundary-disclosures-what-works-vs-what-is-mocked)
+- [Scale-Up Blueprint (India Stack Integration)](#scale-up-blueprint-india-stack-integration)
 - [Repository Structure](#repository-structure)
 - [Technical Stack](#technical-stack)
 - [Getting Started and Local Development](#getting-started-and-local-development)
@@ -24,6 +30,33 @@
 - [Compliance, Ethics, and Sandbox Boundaries](#compliance-ethics-and-sandbox-boundaries)
 - [Project Milestones](#project-milestones)
 - [Contributors](#contributors)
+
+---
+
+## Builder Brief Alignment and Core Questions
+
+The following matrix directly addresses the six evaluation dimensions outlined in the **Build What Moves India** builder brief:
+
+| Evaluation Dimension | Nikaasi Implementation |
+| :--- | :--- |
+| **1. Who is facing the problem?** | India's salaried formal workforce (over 70 million active contributing members). Disproportionately impacts workers leaving their first job, blue-collar workers in high-turnover sectors (logistics, security, retail, construction), and citizens whose regional-language names were transliterated inconsistently across Aadhaar, PAN, and EPFO databases. |
+| **2. What is difficult about the current experience?** | Claim rejections arrive weeks after filing as opaque numeric error codes (e.g., "104-B"). Citizens receive no guidance on what failed or how to fix it, leading to repeated blind resubmissions while facing urgent financial needs. For missing exit dates, citizens are stranded behind non-responsive ex-employers with no statutory recourse mechanism. |
+| **3. What did you change?** | Replaced retrospective rejection notices with pre-emptive pre-flight cross-validation before submission; replaced bureaucratic statutory forms (19, 10C, 31) with OpenAI-powered plain-language intake; established an Exit-Date Self-Attestation workflow backed by an enforceable 15-day employer SLA clock. |
+| **4. Why is your version better?** | Moves from a punitive portal that judges a citizen after 20 days to an accountable system that prevents errors before filing and enforces time-bound statutory escalation on non-responsive employers. |
+| **5. What works today, and what is still mocked?** | **Works Today:** Interactive end-to-end citizen journey, natural language intent classification via OpenAI, multi-field identity diffing, document hashing, 15-day time-travel state engine, and transparent desk tracking.<br>**Mocked & Disclosed:** Aadhaar, PAN, NPCI penny-drop, and EPFO live databases (100% synthetic sandbox data to ensure zero PII exposure). |
+| **6. How could the idea work safely at scale?** | Integrates directly with India Stack: Account Aggregator (AA) ecosystem for instant salary credit verification, DigiLocker for Form 16 / service history retrieval, Aadhaar e-Sign for legally binding self-attestation, and automated administrative override routing under Section 26B of the EPF Scheme. |
+
+---
+
+## Official Submission Summary (178 Words)
+
+One in five Indian provident fund claims is rejected—174 lakh out of 796 lakh in 2024–25. The causes are overwhelmingly clerical: a name spelled differently across Aadhaar and PAN, an unverified bank account, duplicate UANs, or a former employer who never filed an exit date. The member learns weeks later, as an opaque code, with no guidance, and resubmits blind.
+
+EPFO 3.0 is making successful claims faster. It does nothing for the rejected fifth—and as the majority start getting paid in three days, the stuck minority becomes invisible.
+
+Nikaasi designs for that tail. It validates your records against each other before you file, preventing rejection before it occurs. It takes your situation in your own words through an OpenAI-powered intake engine instead of asking you to choose between Form 19, 10C, and 31. Where an employer hasn't filed your exit date, it lets you establish it from evidence you already hold, starting an enforceable 15-day escalation clock on the party responsible.
+
+All data is mocked and disclosed. Independent prototype; not affiliated with EPFO.
 
 ---
 
@@ -77,6 +110,7 @@ Documented claim rejections fall into two primary structural failure modes:
 ```
                      +----------------------------------+
                      | 1. Plain-Language Intent Intake  |
+                     |     (Powered by OpenAI Engine)   |
                      +-----------------+----------------+
                                        |
                                        v
@@ -104,16 +138,16 @@ Documented claim rejections fall into two primary structural failure modes:
                      +----------------------------------+
 ```
 
-### 1. Pre-Flight Validation Engine
+### 1. Plain-Language Conversational Intent Intake (OpenAI Engine)
+Removes statutory jargon and complex form selection from the citizen:
+- Citizens describe their circumstances in conversational natural language (Hindi, English, or mixed vernacular).
+- The OpenAI-powered NLP parser extracts employment status, financial need, and service duration to parameterize statutory forms: **Form 19** (Final PF Settlement), **Form 10C** (Pension Withdrawal Benefit), or **Form 31** (Non-Refundable Advance under specific statutory paragraphs such as Para 68J for illness).
+
+### 2. Pre-Flight Validation Engine
 Rather than subjecting citizens to a multi-week waiting cycle ending in an administrative rejection, Nikaasi inspects member records against simulated Aadhaar, PAN, and banking data prior to formal submission.
 - Employs phonetic and string-distance algorithms to detect transliteration variations.
 - Verifies National Payments Corporation of India (NPCI) bank seeding and active IFSC statuses.
 - Surfaces overlapping service intervals and orphaned Universal Account Numbers (UANs).
-
-### 2. Plain-Language Intent Intake
-Removes statutory jargon and statutory form selection complexity from the citizen:
-- Citizens describe their circumstances in conversational natural language (e.g., *"I resigned last month and need funds for medical treatment"*).
-- The system automatically selects and parameterizes the statutory claim category: **Form 19** (Final PF Settlement), **Form 10C** (Pension Withdrawal Benefit), or **Form 31** (Non-Refundable Advance under specific statutory paragraphs such as Para 68J for illness).
 
 ### 3. Exit-Date Self-Attestation and SLA Escalation
 Solves the Class B structural deadlock where an ex-employer neglects to record the Date of Exit (DoE):
@@ -129,13 +163,64 @@ Replaces vague status notices (such as *"Under Process"*) with complete visibili
 
 ---
 
+## OpenAI Model & Codex Integration
+
+Nikaasi leverages OpenAI models as an integral reasoning and extraction layer within the citizen journey:
+
+```
+[Citizen Natural Language Prompt]
+           |
+           v
+[OpenAI Model / Structured JSON Extraction]
+  - Translates colloquial Hindi/English into statutory schema
+  - Identifies intent: Unemployment vs Medical vs Housing vs Education
+  - Extracts parameters: Amount needed, months since resignation
+           |
+           v
+[Deterministic Statutory Verification Layer]
+  - Validates eligibility against EPF Act 1952 Scheme Rules
+  - Maps to Form 19, 10C, or 31 (Para 68J/68B/68N)
+```
+
+- **Multilingual Intent Comprehension:** Understands vernacular descriptions in conversational Hindi, English, and transliterated Hinglish.
+- **Structured Tool Calling:** Uses OpenAI function calling to return validated JSON payloads directly matching EPFO form schemas.
+- **Deterministic Safeguards:** The LLM does not make final financial disbursement decisions; it acts as a citizen-to-statute translator feeding a deterministic rule verification engine.
+
+---
+
+## Scope and Boundary Disclosures: What Works vs What is Mocked
+
+In strict accordance with the hackathon submission guidelines, the prototype boundaries are clearly defined:
+
+| System Capability | Implementation Status | Technical Mechanism |
+| :--- | :--- | :--- |
+| **Citizen Journey (Start to Finish)** | Fully Operational | Interactive Next.js web application covering intake, pre-flight diffing, document attestation, and disbursal. |
+| **OpenAI Conversational Parser** | Fully Operational | Live structured JSON extraction and statutory paragraph mapping from natural language text. |
+| **Pre-Flight Algorithmic Validator** | Fully Operational | Real-time execution of Jaro-Winkler, Levenshtein, and DOB cross-matching heuristics. |
+| **15-Day SLA Time-Travel Simulator** | Fully Operational | Interactive state machine allowing evaluators to simulate Day 0 to Day 15 SLA transitions and Field Office auto-escalations. |
+| **Government Databases (Aadhaar/PAN/EPFO)** | 100% Synthetic Sandbox | In-memory mock persona registries with zero live network calls or access to real citizen PII. |
+| **Banking / NPCI Penny-Drop** | Mocked Sandbox | Simulated penny-drop verification and bank account seeding validation. |
+
+---
+
+## Scale-Up Blueprint (India Stack Integration)
+
+To transition Nikaasi from an independent prototype to a national production system:
+
+1. **Account Aggregator (AA) Framework:** Integrate with RBI-regulated Account Aggregators to automatically pull verified bank statements and confirm salary cessation dates without manual PDF uploads.
+2. **DigiLocker Integration:** Enable one-click retrieval of digitally signed Form 16 and Service Leaving Certificates directly from issuing employers.
+3. **Aadhaar e-Sign:** Legally bind self-attestation declarations under the Information Technology Act, 2000, using UIDAI e-Sign.
+4. **Automated Statutory Routing (Section 26B):** Integrate directly with EPFO's core field office queue management system for instant administrative override assignment upon SLA expiry.
+
+---
+
 ## System Architecture and Workflow
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Member as Citizen / Worker
-    participant Intake as Nikaasi Intake & Validation
+    participant Intake as Nikaasi Intake (OpenAI Engine)
     participant Attestation as Self-Attestation Engine
     participant Employer as Ex-Employer HR (Sandbox)
     participant FieldOffice as EPFO Regional Office
@@ -189,6 +274,7 @@ sequenceDiagram
 ## Technical Stack
 
 - **Frontend Application:** Next.js (App Router), React, TypeScript, Tailwind CSS.
+- **AI / Intent Processing:** OpenAI GPT-4o API / Structured Function Calling for natural language intent disambiguation.
 - **Validation Engine:** Algorithmic heuristics for phonetic matching (Soundex / Metaphone) and string distance metrics (Jaro-Winkler, Levenshtein).
 - **State Machine and Escalation:** Deterministic event-driven SLA state engine with configurable time-travel triggers for evaluation.
 - **Accessibility Framework:** WCAG 2.1 AA compliance, high-contrast support, responsive layout, and bilingual capability (Hindi / English).
@@ -245,9 +331,10 @@ Comprehensive production documentation is available within the `docs/` directory
 
 ## Project Milestones
 
-- **August 28, 2026 (8:00 PM IST):** Initial Submission (Working prototype and production documentation).
-- **September 1, 2026:** Announcement of Shortlisted Projects.
-- **September 7, 2026:** Mentorship and Refinement Iteration.
+- **August 28, 2026 (8:00 PM IST):** Initial Submission (Working prototype, public link, video demo, and production documentation).
+- **September 1, 2026:** Announcement of Top 250 Shortlist.
+- **September 7, 2026:** Resubmission after Mentorship Iteration.
+- **September 8–12, 2026:** Finalists Announcement (Top 10).
 - **September 12, 2026:** Grand Finale in Bengaluru.
 
 ---

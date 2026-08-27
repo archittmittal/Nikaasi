@@ -2,20 +2,48 @@
 
 ## Document Control
 
-- **Document Version:** 1.0.0
+- **Document Version:** 1.1.0
 - **Project Name:** Nikaasi (Provident Fund Dispute and Claim Resolution Engine)
 - **Track:** Build What Moves India (Public Digital Infrastructure Track)
+- **AI Core:** OpenAI GPT-4o / Codex Structured Intent Extraction Layer
 - **Classification:** Public Digital Infrastructure Specification (Independent Prototype)
 
 ---
 
-## 1. Executive Summary and Problem Statement
+## 1. Builder Brief Alignment and Six Core Evaluation Questions
 
-In India, Provident Fund (PF) deposits represent compulsory, salary-deducted life savings managed by the Employees' Provident Fund Organisation (EPFO). Over 796 lakh claims were submitted in FY 2024-25, out of which **174 lakh claims (21.8%) were rejected**.
+This specification directly operationalizes the evaluation criteria defined in the **Build What Moves India** builder brief:
 
-Current public portal infrastructure notifies citizens of claim rejections weeks after filing through unhelpful numeric reason codes (such as "Code 104-B" or "KYC Incomplete"). The member is left with no actionable guidance on corrective steps and frequently enters a loop of blind resubmissions. Furthermore, when an ex-employer fails to record the member's Date of Exit (DoE), the citizen is rendered completely powerless, as the portal provides no statutory mechanism for self-attestation or administrative escalation.
+### 1.1 Who is facing the problem?
+The target population is India's salaried workforce governed by the Employees' Provident Fund Organisation (EPFO), representing over 70 million actively contributing members and 300 million total registered UANs. The failure modes disproportionately penalize:
+- First-time job switchers who have unmerged, fragmented UANs.
+- Contractual and blue-collar workers in high-turnover sectors (construction, security, logistics, manufacturing).
+- Citizens whose vernacular names have been transliterated with minor spelling inconsistencies between Aadhaar, PAN, and EPFO records.
 
-Nikaasi re-architects this process by shifting from retrospective failure notification to **pre-emptive pre-flight cross-validation**, **plain-language intake**, **exit-date self-attestation**, and **transparent, time-bound statutory escalation**.
+### 1.2 What is difficult about the current experience?
+The legacy EPFO member portal (UAN Member e-Sewa) and grievance portal (EPFiGMS) operate on a punitive, asynchronous model:
+- Rejections arrive 15 to 25 days after submission as terse, non-actionable numeric error codes (e.g., "Rejected: 104-B").
+- Citizens are not provided with an explanation of the root cause or a structured sequence of corrective actions.
+- When an ex-employer fails to record the member's Date of Exit (DoE), the citizen has zero portal-based recourse and is locked in an indefinite administrative freeze.
+
+### 1.3 What did you change?
+1. **Pre-emptive Pre-Flight Validation:** Inspects member data against simulated Aadhaar, PAN, and banking databases *before* claim generation.
+2. **OpenAI-Powered Conversational Intake:** Replaces complex statutory forms (Forms 19, 10C, 31) with natural language comprehension in Hindi, English, and Hinglish.
+3. **Exit-Date Self-Attestation with 15-Day SLA Clock:** Introduces alternative documentary evidence submission and an automated statutory escalation clock.
+4. **Radical Honest Tracking:** Replaces vague "Under Process" messages with explicit holding desk assignments, live countdown timers, and escalation points.
+
+### 1.4 Why is your version better?
+The current system judges the citizen retrospectively after weeks of silence. Nikaasi inverts this relationship by acting as an active citizen advocate: preventing clerical errors before filing and placing an enforceable deadline on third parties.
+
+### 1.5 What works today, and what is still mocked?
+- **Operational Prototype:** End-to-end interactive citizen journey, OpenAI conversational intent classification, multi-field identity diffing, cryptographic evidence hashing, 15-day SLA state machine with time-travel evaluation controls, and transparent tracking dashboard.
+- **Mocked Sandbox:** Authoritative government registries (Aadhaar, PAN, NPCI penny-drop, EPFO UAN master) are strictly simulated with synthetic personas to maintain complete privacy and zero live PII exposure.
+
+### 1.6 How could the idea work safely at scale?
+- **Account Aggregator (AA) Ecosystem:** Pull authenticated bank statements directly via RBI-regulated AA frameworks to verify salary credit cessation without manual file uploads.
+- **DigiLocker Integration:** Direct retrieval of digitally signed Form 16 and employment separation records.
+- **Aadhaar e-Sign:** Legally binding self-attestation declarations under the IT Act, 2000.
+- **Automated Regional Office Dispatch:** Auto-route breached claims to the Assistant PF Commissioner queue under Section 26B administrative override powers.
 
 ---
 
@@ -23,101 +51,76 @@ Nikaasi re-architects this process by shifting from retrospective failure notifi
 
 ### Persona 1: Rajesh Kumar (First-Time Job Switcher)
 - **Profile:** 24-year-old delivery executive transitioning to a warehouse supervisory role.
-- **Pain Point:** Has an unmerged UAN from his previous employer. His name is recorded as "Rajesh Kumar" on Aadhaar and "Rajesh Kr" on EPFO.
-- **Goal:** Transfer or withdraw PF without his claim bouncing after three weeks.
+- **Pain Point:** Has an unmerged UAN from his previous employer. Name is "Rajesh Kumar" on Aadhaar and "Rajesh Kr" on EPFO.
+- **Journey:** Pre-flight engine flags transliteration difference with non-blocking confidence, merges UAN records, and prepares Form 19/10C package.
 
 ### Persona 2: Sunita Devi (Defunct Employer Worker)
-- **Profile:** 38-year-old garment worker whose previous factory closed operations without filing member exit dates.
-- **Pain Point:** Cannot file Form 19/10C because Date of Exit is blank; HR is unreachable.
-- **Goal:** Establish her exit date using salary slips and bank statements and withdraw her accumulated PF.
+- **Profile:** 38-year-old garment worker whose previous employer shuttered without recording employee exit dates.
+- **Pain Point:** Cannot submit final settlement because Date of Exit is blank; HR is defunct.
+- **Journey:** Enters self-attestation flow, uploads Form 16 and last pay slip, triggers 15-day SLA clock, and auto-escalates to Regional Commissioner.
 
 ### Persona 3: Amit Verma (Medical Emergency Advance Claimant)
-- **Profile:** 45-year-old factory technician requiring immediate funds for an emergency hospitalization.
-- **Pain Point:** Confused by regulatory jargon (Form 31, Para 68J, Rule 68B) and does not know how much he is legally entitled to withdraw.
-- **Goal:** State his emergency in simple Hindi/English and receive an auto-filled, eligible advance claim.
+- **Profile:** 45-year-old technician requiring emergency funds for immediate hospitalization.
+- **Pain Point:** Confused by statutory jargon (Para 68J, Form 31) and maximum ceiling limits.
+- **Journey:** Types "Need 50000 rupees for my father's surgery"; OpenAI parser identifies Form 31 (Para 68J) and calculates instant eligibility.
 
 ---
 
 ## 3. Regulatory and Statutory Framework
 
-Nikaasi aligns with the Employees' Provident Funds and Miscellaneous Provisions Act, 1952, and its subordinate schemes:
-
-| Statutory Instrument | Regulatory Scope | Traditional Requirement | Nikaasi Transformation |
+| Statutory Instrument | Scope | Traditional Rule | Nikaasi Transformation |
 | :--- | :--- | :--- | :--- |
-| **Form 19** | Final Settlement of Provident Fund | Requires minimum 2 months of unemployment and marked Date of Exit (DoE). | Auto-computed upon unemployment intent; triggers Self-Attestation flow if DoE is missing. |
-| **Form 10C** | Pension Withdrawal Benefit / Scheme Certificate | Eligible for members with service between 6 months and 10 years. | Automatically bundled with Form 19 based on service tenure calculation. |
-| **Form 31 (Para 68J)** | Non-Refundable Advance for Medical Treatment | Requires medical certificate and minimum balance eligibility. | Auto-mapped from natural language input; automatically calculates eligible ceiling. |
-| **Form 31 (Para 68B)** | Advance for Purchase / Construction of House | Requires minimum 5 years of continuous service. | Service history automatically validated across all active and legacy UANs. |
+| **Form 19** | Full & Final PF Settlement | Requires 2 months unemployment and verified Date of Exit. | Auto-selected upon unemployment intent; triggers Self-Attestation if DoE is missing. |
+| **Form 10C** | Pension Withdrawal Benefit | Requires between 6 months and 10 years of total service. | Automatically bundled with Form 19 based on service history calculation. |
+| **Form 31 (Para 68J)** | Non-Refundable Advance for Illness | Requires medical emergency intent and minimum balance. | OpenAI intent parser maps illness statements directly to Para 68J with ceiling calculations. |
+| **Form 31 (Para 68B)** | Advance for Housing / Construction | Requires minimum 5 years continuous service. | Service history automatically verified across legacy and active UANs. |
 
 ---
 
 ## 4. Functional Requirements
 
-### FR-01: Plain-Language Conversational Intent Intake
-- **Description:** The system must accept natural language descriptions of the user's circumstances in English or Hindi and automatically identify the correct statutory form and paragraph.
-- **Inputs:** Free-form text input or guided scenario selections (e.g., job resignation, medical emergency, home purchase).
-- **Output:** Selected claim package (Form 19, Form 10C, or Form 31 with specific paragraph mapping) along with calculated maximum withdrawal eligibility.
+### FR-01: OpenAI-Powered Natural Language Intake
+- System must accept unstructured natural language input in English, Hindi, and transliterated Hinglish.
+- OpenAI model extracts: `employmentStatus`, `intentCategory`, `requestedAmount`, `monthsSinceExit`, and `serviceTenureMonths`.
+- Outputs structured JSON mapped to statutory form requirements with deterministic fallback validation.
 
-### FR-02: Pre-Flight Cross-Validation Engine
-- **Description:** The system must validate member profile data across simulated Aadhaar, PAN, and Bank databases prior to formal claim generation.
-- **Validation Rules:**
-  - `RULE-01 (Identity Match):` Aadhaar Name vs. EPFO Name fuzzy similarity must score >= 0.88 (Jaro-Winkler). Transliteration differences must be flagged with a non-blocking normalization suggestion.
-  - `RULE-02 (Date of Birth):` Date of birth across Aadhaar and EPFO must match exactly.
-  - `RULE-03 (Bank Seeding):` Bank account must be active, have completed penny-drop verification, and be linked to the member's Aadhaar.
-  - `RULE-04 (Service History):` Check for fragmented UANs and overlapping service dates.
+### FR-02: Pre-Flight Algorithmic Cross-Validation
+- Validates member profile data across simulated Aadhaar, PAN, and Banking records.
+- Executes Jaro-Winkler string similarity on full names (threshold >= 0.88 for phonetic equivalence).
+- Checks active NPCI Aadhaar-bank account seeding and IFSC validity.
 
-### FR-03: Prescriptive Class A Remediation Guide
-- **Description:** If a Class A data mismatch is detected during pre-flight validation, the system must generate a step-by-step resolution roadmap.
-- **Requirements:** 
-  - Provide clear, sequenced instructions on which record to update first (e.g., Joint Declaration vs. Bank Seeding).
-  - Estimate the resolution time for each corrective step.
+### FR-03: Prescriptive Guided Remediation (Class A)
+- If identity or bank discrepancies are detected, generates an ordered, step-by-step remediation roadmap.
 
-### FR-04: Exit-Date Self-Attestation Portal (Class B Resolution)
-- **Description:** When a member's Date of Exit (DoE) is absent, the system must allow the member to self-declare their exit date by submitting evidentiary documents.
-- **Accepted Proof Types:** Last salary slip, Form 16 Part A/B, or bank statement showing the cessation of salary credits.
-- **Integrity Guarantee:** Generate a SHA-256 hash of all uploaded documents and create a tamper-evident self-attestation package.
+### FR-04: Exit-Date Self-Attestation (Class B)
+- When Date of Exit (DoE) is absent, enables worker to declare exit date and attach supporting evidence (Form 16, salary slips, bank statement).
+- Generates SHA-256 cryptographic hashes of uploaded evidence.
 
-### FR-05: 15-Day Employer SLA Escalation State Machine
-- **Description:** Upon submission of an exit-date self-attestation, an automated 15-calendar-day SLA clock is initiated for the ex-employer.
-- **Workflow:**
-  - Day 0: Formal verification notice dispatched to employer HR.
-  - Days 1-14: Active countdown displayed to both citizen and employer.
-  - Day 15: If employer fails to confirm or contest, claim is automatically transitioned to `ESCALATED_TO_REGIONAL_OFFICE`.
-  - Field Office Action: EPFO Assistant Commissioner receives dossier with documentary proofs for administrative override.
+### FR-05: 15-Day SLA Escalation State Machine
+- Initiates an enforceable 15-calendar-day countdown on the ex-employer.
+- Auto-escalates the claim dossier to the EPFO Regional Office (RPFC) on Day 15 if unacknowledged.
 
-### FR-06: Radical Honest Tracking and Observability Dashboard
-- **Description:** Provide a transparent, real-time tracking interface that displays the exact holding desk, active SLA timer, and escalation hierarchy.
-- **Display Fields:** Current Stage, Assigned Entity (e.g., Employer HR Desk or Field Office), Days Elapsed / Remaining, Next Automatic Action, and Direct Contact Information.
+### FR-06: Radical Honest Tracking Dashboard
+- Displays live holding desk assignment, remaining SLA days, and escalation nodal contacts.
 
-### FR-07: Interactive Evaluation Sandbox Controls
-- **Description:** For evaluation and demonstration purposes, provide controls to switch between mock personas and advance time (simulate Day 0 to Day 15 SLA transitions).
+### FR-07: Evaluator Sandbox Controls
+- Provides instant persona switching and time-travel controls to test Day 0 to Day 15 SLA state transitions.
 
 ---
 
 ## 5. Non-Functional Requirements
 
-### NFR-01: Performance and Latency
-- Pre-flight cross-validation results must be rendered within 500 milliseconds.
-- Intent classification must complete within 300 milliseconds.
-
-### NFR-02: Accessibility and Usability
-- Interface must conform to WCAG 2.1 AA guidelines.
-- Responsive mobile-first design supporting viewports from 360px width upwards.
-- Full bilingual language parity between Hindi and English.
-
-### NFR-03: Data Privacy and Sandboxing
-- Strict adherence to the Digital Personal Data Protection (DPDP) Act, 2023.
-- No live government API calls; 100% synthetic mock data.
-- Aadhaar numbers must be masked, displaying only the last 4 digits (e.g., `XXXX-XXXX-1234`).
-
-### NFR-04: Deterministic Auditability
-- Every state change in the claim lifecycle must generate an immutable, timestamped audit log.
+- **NFR-01 (Performance):** Pre-flight validation response < 500ms; OpenAI intent parsing < 1500ms.
+- **NFR-02 (Accessibility):** WCAG 2.1 AA compliant, mobile-first responsive layout (down to 360px width), bilingual Hindi/English.
+- **NFR-03 (Data Privacy):** 100% synthetic sandbox data; no real citizen PII; zero backend PII persistence.
+- **NFR-04 (Auditability):** Deterministic audit trail for every state transition with ISO 8601 UTC timestamps.
 
 ---
 
-## 6. Acceptance Criteria
+## 6. Hackathon Deliverables Specification
 
-1. **Intake Accuracy:** Entering a scenario description indicating job departure 3 months ago correctly resolves to Form 19 + Form 10C.
-2. **Pre-Flight Diagnostic:** A name discrepancy (e.g., "Archit Mittal" vs "Architt Mittal") is surfaced with phonetic match confidence and does not result in an opaque rejection.
-3. **Attestation and SLA:** Uploading supporting proof initiates a 15-day SLA. Simulating time-travel to Day 15 automatically moves the claim to the Field Office queue.
-4. **Zero Live Data Leakage:** All data models operate entirely in a sandbox environment without contacting external services.
+1. **Public Live Link:** Deployed on modern edge infrastructure, accessible directly in any web browser without authentication barriers or application downloads.
+2. **Video Demonstration (≤ 2 Minutes):**
+   - Minute 1: End-to-end citizen journey demonstrating deliberate Class B failure and self-attestation recovery.
+   - Minute 2: Architectural "how and why", OpenAI integration, and India Stack scale-up model.
+3. **Written Summary:** Structured executive summary under 250 words.
