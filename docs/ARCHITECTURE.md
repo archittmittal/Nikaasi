@@ -2,24 +2,25 @@
 
 ## Document Metadata
 
-- **Document Version:** 1.0.0
+- **Document Version:** 1.1.0
 - **Status:** Approved Architecture
 - **Target Audience:** System Architects, Core Engineers, Technical Evaluators, Security Auditors
 - **Classification:** Public Digital Infrastructure Specification (Independent Prototype)
+- **AI Reasoning Subsystem:** OpenAI GPT-4o / Codex Structured Parsing Engine
 
 ---
 
 ## 1. Architectural Vision and Principles
 
-Nikaasi is designed as a resilience layer on top of India's social security digital public infrastructure. The platform shifts the paradigm from a punitive administrative portal that passively judges a citizen's application to an active, preventative, and accountable citizen advocate.
+Nikaasi is designed as a citizen-advocate resilience layer on top of India's social security digital public infrastructure. The platform shifts the paradigm from a punitive administrative portal that passively rejects citizen applications to an active, preventative, and accountable system.
 
 ### Core Design Principles
 
-1. **Prevention Over Narration:** Prevent rejections at intake by cross-referencing records against simulated authoritative data stores before form submission.
-2. **Intent-Driven Interaction:** Abstract statutory codes (e.g., Para 68J, Form 19, Form 10C) behind conversational, plain-language scenario builders.
-3. **Equitable Escalation (Statutory Recourse):** Guarantee that uncooperative or defunct third parties (employers) cannot indefinitely stall citizen access to their accumulated savings.
-4. **Radical Transparency:** Expose exact processing bottlenecks, desk assignments, and deterministic countdown timers for every lifecycle event.
-5. **Universal Accessibility:** Build for low-bandwidth networks, vernacular language users (Hindi and English), and WCAG 2.1 AA accessibility standards.
+1. **Prevention Over Narration:** Prevent claim rejections prior to formal filing by executing cross-database pre-flight checks against simulated authoritative sources.
+2. **Intent-Driven Natural Language Intake:** Leverage OpenAI models to abstract statutory codes (Forms 19, 10C, 31, Para 68J/68B) behind natural vernacular conversations in Hindi and English.
+3. **Equitable Escalation (Statutory Recourse):** Guarantee that uncooperative third parties (ex-employers) cannot indefinitely lock citizen savings through an automated 15-day SLA escalation clock.
+4. **Radical Transparency:** Expose exact holding desks, responsible officers, and deterministic countdown timers for every lifecycle event.
+5. **Universal Accessibility:** Build for low-bandwidth mobile devices, vernacular language comprehension, and WCAG 2.1 AA accessibility standards.
 
 ---
 
@@ -30,6 +31,8 @@ Nikaasi is designed as a resilience layer on top of India's social security digi
 ```mermaid
 graph TD
     Citizen[Citizen / PF Member] -->|Natural Language Intent & Attestation Proofs| Nikaasi[Nikaasi System]
+    
+    Nikaasi -->|Conversational Parsing & Intent Extraction| OpenAI[OpenAI GPT-4o / Codex Engine]
     
     Nikaasi -->|Simulated Cross-KYC Query| AadhaarSandbox[Aadhaar Verification Sandbox]
     Nikaasi -->|Simulated Tax Filing Query| PANSandbox[Income Tax PAN Sandbox]
@@ -50,10 +53,10 @@ graph TD
 
     subgraph Application Tier
         APIGateway[API Gateway & Router]
-        IntakeEngine[Natural Language Intent Mapper]
-        PreflightEngine[Pre-Flight Validation Engine]
-        AttestationEngine[Exit-Date Self-Attestation Engine]
-        SLAMachine[SLA State Machine & Scheduler]
+        IntakeEngine[OpenAI Intent Classifier & Prompt Pipeline]
+        PreflightEngine[Pre-Flight Validation Engine - Jaro-Winkler / Metaphone]
+        AttestationEngine[Exit-Date Self-Attestation & Hashing Engine]
+        SLAMachine[15-Day SLA State Machine & Scheduler]
         AuditLogger[Immutable Audit Ledger Service]
     end
 
@@ -70,6 +73,7 @@ graph TD
     APIGateway --> SLAMachine
     APIGateway --> AuditLogger
 
+    IntakeEngine -->|Structured Output| PreflightEngine
     PreflightEngine --> PersonaStore
     AttestationEngine --> ClaimStore
     SLAMachine --> ClaimStore
@@ -80,30 +84,32 @@ graph TD
 
 ## 3. Core Subsystems
 
-### 3.1 Intake and Intent Disambiguation Subsystem
+### 3.1 OpenAI-Powered Conversational Intake Subsystem
 
-The Intake Subsystem accepts unformatted natural language text from the citizen and maps it to statutory claim types without exposing regulatory jargon.
+The Intake Subsystem translates unformatted natural language into validated statutory claim parameters using OpenAI GPT-4o with structured tool calling:
 
 ```
 +-------------------------------------------------------+
-| Citizen Input: "I resigned 2 months ago and need      |
-| funds for hospital surgery."                          |
+| Citizen Input (Hindi/English/Hinglish):               |
+| "Maine 2 mahine pehle job chhod di thi, mujhe PF      |
+| aur pension ka poora paisa nikalna hai."              |
 +---------------------------+---------------------------+
                             |
                             v
 +-------------------------------------------------------+
-| Rule-Based Intent Classifier / Lexical Parser         |
-| - Employment Status: RESIGNED (> 60 days)             |
-| - Primary Need: MEDICAL TREATMENT                     |
-| - Service Duration: Evaluated against 5-year threshold|
+| OpenAI Semantic Parsing Layer                         |
+| - employment_status: "RESIGNED"                       |
+| - months_unemployed: 2                                |
+| - intent_category: "FULL_FINAL_SETTLEMENT"            |
+| - requested_amount: null (Full Balance)               |
 +---------------------------+---------------------------+
                             |
                             v
 +-------------------------------------------------------+
-| Statutory Claim Mapping:                              |
-| - Form 19: Full & Final Settlement (PF)               |
-| - Form 10C: Pension Withdrawal Benefit                |
-| - Form 31: Para 68J (Illness Advance)                 |
+| Deterministic Statutory Mapping:                      |
+| - Primary Form: FORM_19 (Final PF Settlement)         |
+| - Secondary Form: FORM_10C (Pension Benefit)          |
+| - Statutory Paragraph: None (Full Withdrawal)         |
 +-------------------------------------------------------+
 ```
 
@@ -227,9 +233,11 @@ The claim lifecycle is governed by a deterministic finite state machine (FSM):
 
 ---
 
-## 5. Resilience, Security, and Scalability
+## 5. Scale-Up Architecture (India Stack Public Infrastructure)
 
-1. **Stateless Compute Layer:** The application services run as stateless workers capable of horizontal autoscaling under peak tax-season claim surges.
-2. **Idempotency Safeguards:** Every claim submission carries an idempotency token (`Idempotency-Key`) preventing duplicate statutory claim creation.
-3. **Data Boundary Isolation:** The sandbox environment strictly enforces isolation from external networks and live government interfaces, guaranteeing complete privacy and zero data leakage.
-4. **Client-Side Compute Optimization:** Form cross-validation and fuzzy string diffing are executed locally in the browser to reduce server round-trips and provide instant feedback.
+In a national production rollout, Nikaasi integrates with India Stack primitives:
+
+1. **Account Aggregator (AA) Layer:** Replaces manual bank slip uploads with automated, user-consented financial information provider (FIP) queries to confirm cessation of salary credits.
+2. **DigiLocker Gateway:** Direct machine-to-machine retrieval of Form 16 Part A/B and authenticated digital relieving letters.
+3. **Aadhaar e-Sign:** Legally binding citizen attestation under Section 5 of the Information Technology Act.
+4. **Field Office Queue Multiplexing:** Dynamic routing to Assistant PF Commissioners based on workload indexing across all 138 EPFO Regional Offices.
